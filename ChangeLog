@@ -1,0 +1,90 @@
+CHANGELOG FOR BLACKFISH PROJECT
+
+Current Version
+
+ - hiding of Cisco CDP protocol frames (parameter -Hcdp)
+ - fixed LLC handling
+ - RIP and RIPv2 routing protocols supported
+
+Version 1.2
+
+ - hiding of the ethernet loopback frames supported, usefull when dealing
+   with Cisco routers that periodically send such frames over ethernet to
+   check if layer 2 connection is still alive (parametr -Hel)
+ - modyfied look of icmp6 packets in v2 and v3 modes
+ - new verbose mode (v3+) shows all info that is shown by v3 mode plus data
+   caried by tcp, udp and icmp protocols
+ - modyfied look of icmp packets in v2 and v3 modes
+ - bfish has been ported fot Linux operation system 
+ - bfish has been ported for IBM AIX operation system
+ - new verbose mode 3+ that prints all of mode 3 information and data caried
+   by tcp and udp protocols
+ - HEX output mode now prints 16 values each line
+ - HEX output mode now prints blank line after each frame
+ - changed llok of 3 verbosity mode in IP handler to show more info about
+   FRAG and TOS fields
+ - SHOST and DHOST for ethernet and IEEE 802.3 changed to SRC and DST
+ - tcp and udp cksum computing corrected
+ - 'Router Selection' ICMP message name corrected to 'Router Solicitation'
+ - bfish is now fully based on the netz sdk
+ - TOS display bit 0 corrected
+ - net and netinet header files abandoned for new netz network support sdk
+ - 'alternate checksum request' and 'alternate checksum data' TCP options added
+ - 'POC permit' and 'POC service profile' TCP options added
+ - IP view improved to provide more detailed information 
+ - ARP protocol packet look improved
+ - added support for Novell's proprietary 802.3 RAW frame
+ - added support for IEEE 802.3 SNAP
+ - added support for IEEE 802.2 LLC protocol
+ - added support for IEEE 802.1q VLAN tagging
+ - added support for IEEE 802.3 frames
+ - type specific informations added to ICMP handler in verbose mode 3
+ - traceroute ip option support added
+ - source and destination address labels changed to 'SRC' and 'DST' for IP and
+   Ethernet protocols
+ - ICMPv6 support added
+ - minor ANSI C, NetBSD and FreeBSD compatibility errors fixed, so bfish
+   is capable to compile and work under NetBSD and FreeBSD as well as
+   under OpenBSD !!! ;)
+ - validation for correct (RFC894) ethernet frames added, other stuff are not
+   displayed
+ - more ethertypes correctly displayed
+ - IPv6 over IPv4 supported as well as IPv6 over IPv6, IPv4 over IPv6 and
+   IPv4 over IPv4 (last one was supported earlier)
+ - basic support for IPv6 added, currently only main IPv6 header is recognized
+ - much faster computing of TCP/UDP checksum implemented, now ip pseudo
+   checksum is computed by IP/IPv6 handler and its given to TCP/UDP handler
+   so there is no need to do time consuming packet copying to compute it 
+ - PROTO changed to PR in verbose mode 3 for IPv4 protocol 
+ - added version field in verbose mode 3 for IPv4 protocol
+ - new output modes added, raw mode '-mr{2|3|4|5}' and hex mode '-mh{2|3|4|5}'
+ - all controll messages are displayed on stderr, stdout is reserved for packet
+   analiser output only
+ - direct output to a file added, options '-o' and '-O'
+ - changed choosing of output mode, now there is one new option for it '-m'
+   '-v' and '-s' options are no longer present, instead can be used '-mv{1|2|3}'
+   and '-ms{1|2|3}'
+ - UDP special mode 3 fixed, now shows data length
+ - TCP Sack option bug fixed
+ - IP Xsecurity option bug fixed
+
+Version 1.1 
+ 
+ - help added, at least ;)
+ - improved support for IP and TCP options
+ - support for interfaces that haven't assigned IPv4 address,
+   stealth sniffing ;)
+ - default capture length is now set automatically according to mtu value
+   of interface, it makes us sure to default capture of whole packet
+ - mtu value discovering for choosen interface added
+ - added support for udp packets witchout cksum, now cksum in these packets is
+   reported as 'NONE'
+ - basic support for ip options added (still under development) 
+ - new support for tcp otions (still under development), now options can
+   be displayed in few lines
+ - pcap messages modyfied
+ - showing of chosen interface name added
+ - capture length option added '-c'
+
+Version 1.0 - first published version
+

@@ -1,0 +1,9 @@
+#ifndef _BFISH_VERSION_H_
+#define _BFISH_VERSION_H_
+
+#define BFISH_MAJOR_VERSION 3
+#define BFISH_MINOR_VERSION 0
+#define BFISH_VERSION "3.0"
+#define BFISH_BUILD_DATE "Dec 16 02:32:48 UTC 2021"
+
+#endif /* _BFISH_VERSION_H_ */

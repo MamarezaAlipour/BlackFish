@@ -1,0 +1,5 @@
+CC=c++
+LD=c++
+CFLAGS="-shared -Wall -pedantic"
+DEPEND_COMMAND="$CC -MM -I$INCLUDE_DIR $SOURCE_LIST > .depend"
+SUFFIXES=NO

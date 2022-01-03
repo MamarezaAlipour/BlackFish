@@ -1,0 +1,96 @@
+#! /bin/sh
+NAME=bfish
+MAJOR_VERSION=$(head -1 VERSION)
+MINOR_VERSION=$(tail -1 VERSION)
+VERSION=$MAJOR_VERSION.$MINOR_VERSION
+BUILD_DATE=$(date)
+
+PREFIX=/usr/local
+
+LIB_DIR=$PREFIX/lib
+INCLUDE_DIR=$PREFIX/include
+
+OS_NAME=$(uname -s | tr [a-z] [A-Z])
+
+SOURCE_LIST=$(echo $(ls *.cc))
+HEADER_LIST=$(echo $(ls *.h))
+OBJECT_LIST=$(echo $SOURCE_LIST | sed -e 's/.cc/.o/g')
+
+
+case $OS_NAME in
+    OPENBSD) echo "Configuring for OpenBSD operation system...";
+             . ./config.BSD;;
+    FREEBSD) echo "Configuring for FreeBSD operation system...";
+             . ./config.BSD;;
+    NETBSD)  echo "Configuring for NetBSD operation system...";
+             . ./config.BSD;;
+    AIX)     echo "Configuring for AIX operation system...";
+             . ./config.AIX;;
+    LINUX)   echo "Configuring for Linux operation system...";
+             . ./config.LINUX;;
+    *)       echo "Unknown operation system...";
+             exit 1;;
+esac
+
+
+CFLAGS="$CFLAGS -DOS_$OS_NAME -L$LIB_DIR -I$INCLUDE_DIR"
+LIBS="-lpcap -lnetz -lstdc++ "
+
+if [ x$1 = xCREATE_VERSION_H ]
+then
+    exec 1> version.h
+
+    cat licence
+    echo "#ifndef _BFISH_VERSION_H_"
+    echo "#define _BFISH_VERSION_H_"
+    echo
+    echo "#define BFISH_MAJOR_VERSION $MAJOR_VERSION"
+    echo "#define BFISH_MINOR_VERSION $MINOR_VERSION"
+    echo '#define BFISH_VERSION "'$VERSION'"'
+    echo '#define BFISH_BUILD_DATE "'$BUILD_DATE'"'
+    echo
+    echo "#endif /* _BFISH_VERSION_H_ */"
+    echo
+fi
+   
+exec 1> Makefile.tmp
+
+echo "NAME=$NAME"
+echo "VERSION=$VERSION"
+echo ""
+echo "PREFIX=$PREFIX"
+echo "OS_NAME=$OS_NAME"
+echo ""
+echo "CC=$CC"
+echo "CFLAGS=$CFLAGS"
+echo ""
+
+echo "all: $OBJECT_LIST"
+echo "	$LD -L$LIB_DIR -o $NAME $OBJECT_LIST $LIBS"
+echo ""
+
+echo "depend:"
+echo "	$DEPEND_COMMAND"
+echo ""
+echo "clean:"
+echo "	-rm .depend"
+echo "	-rm $OBJECT_LIST"
+echo "	-rm $NAME"
+echo ""
+
+echo "install:"
+echo "	cp $NAME $PREFIX/sbin"
+echo ""
+
+echo "uninstall:"
+echo "	-rm -r $PREFIX/sbin/$NAME"
+echo ""
+
+if [ $SUFFIXES = YES ]
+then
+    echo ".SUFFIXES:.o .cc"
+    echo ".cc.o:"
+    echo "	$CC $CFLAGS -c $<"
+    echo ""
+fi
+

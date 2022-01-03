@@ -1,0 +1,7 @@
+CC=gcc
+LD=ld
+CFLAGS="-shared -Wall -pedantic"
+DEPEND_COMMAND="$CC -MM $SOURCE_LIST > .depend"
+SUFFIXES=YES
+DO_STATIC=YES
+DO_SHARED=YES

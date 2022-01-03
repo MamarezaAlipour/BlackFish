@@ -1,0 +1,164 @@
+#! /bin/sh
+
+NAME=netz
+MAJOR_VERSION=$(head -1 VERSION)
+MINOR_VERSION=$(tail -1 VERSION)
+VERSION=$MAJOR_VERSION.$MINOR_VERSION
+BUILD_DATE=$(date)
+
+PREFIX=/usr/local
+
+LIB_DIR=$PREFIX/lib
+INCLUDE_DIR=$PREFIX/include
+
+OS_NAME=$(uname -s | tr [a-z] [A-Z])
+
+SOURCE_LIST=$(echo $(ls *.cc))
+HEADER_LIST=$(echo $(ls *.h))
+OBJECT_LIST=$(echo $SOURCE_LIST | sed -e 's/.cc/.o/g')
+
+STATIC_NAME=lib${NAME}.a
+SHARED_NAME=lib${NAME}.so.${VERSION}
+SHARED_LINK=lib${NAME}.so
+
+
+AR=ar
+ARFLAGS=crv
+
+
+case $OS_NAME in
+    OPENBSD) echo "Configuring for OpenBSD operation system...";
+             . ./config.BSD;;
+    FREEBSD) echo "Configuring for FreeBSD operation system...";
+             . ./config.BSD;;
+    NETBSD)  echo "Configuring for NetBSD operation system...";
+             . ./config.BSD;;
+    AIX)     echo "Configuring for AIX operation system...";
+             . ./config.AIX;;
+    LINUX)   echo "Configuring for Linux operation system...";
+             . ./config.LINUX;;
+    *)       echo "Unknown operation system...";
+             exit 1;;
+esac
+
+if [ $DO_STATIC = YES ]
+then
+    echo "Configuring for static libraries...";
+fi
+
+if [ $DO_SHARED = YES ]
+then
+    echo "Configuring for shared libraries...";
+fi
+
+CFLAGS="$CFLAGS -DOS_$OS_NAME -L$LIB_DIR -I$INCLUDE_DIR"
+
+
+if [ x$1 = xCREATE_VERSION_H ]
+then
+    exec 1> version.h
+
+    cat licence
+    echo "#ifndef _NETZ_VERSION_H_"
+    echo "#define _NETZ_VERSION_H_"
+    echo
+    echo "#define NETZ_MAJOR_VERSION $MAJOR_VERSION"
+    echo "#define NETZ_MINOR_VERSION $MINOR_VERSION"
+    echo '#define NETZ_VERSION "'$VERSION'"'
+    echo '#define NETZ_BUILD_DATE "'$BUILD_DATE'"'
+    echo
+    echo "int netz_major_version();"
+    echo "int netz_minor_version();"
+    echo "char* netz_version(char*);"
+    echo "char* netz_build_date(char*);"
+    echo
+    echo "#endif /* _NETZ_VERSION_H_ */"
+    echo
+fi
+  
+ 
+exec 1> Makefile.tmp
+
+echo "CFLAGS=$CFLAGS"
+echo ""
+
+echo "all: $OBJECT_LIST"
+
+if [ $DO_STATIC = YES ]
+then
+    echo "	$AR $ARFLAGS $STATIC_NAME $OBJECT_LIST";
+fi
+
+if [ $DO_SHARED = YES ]
+then
+    echo "	$LD -Bshareable -o $SHARED_NAME $OBJECT_LIST";
+fi
+
+echo ""
+
+echo "depend:"
+echo "	$DEPEND_COMMAND"
+echo ""
+
+echo "clean:"
+echo "	-rm .depend"
+echo "	-rm version.h"
+echo "	-rm $OBJECT_LIST"
+
+if [ $DO_STATIC = YES ]
+then
+    echo "	-rm $STATIC_NAME"
+fi
+
+if [ $DO_SHARED = YES ]
+then
+    echo "	-rm $SHARED_NAME"
+fi
+
+echo ""
+
+echo "install:"
+echo "	mkdir -p $PREFIX/include/netz"
+echo "	cp $HEADER_LIST $PREFIX/include/netz"
+echo "	cp licence netz.tmp"
+echo "	ls $HEADER_LIST >> netz.tmp"
+echo "	sed -e '35,$$ s/.*/#include <netz\/&>/' netz.tmp > netz.h"
+echo "	rm netz.tmp"
+echo "	mv netz.h $PREFIX/include"
+
+if [ $DO_STATIC = YES ]
+then
+    echo "	cp $STATIC_NAME $PREFIX/lib"
+fi
+
+if [ $DO_SHARED = YES ]
+then
+    echo "	cp $SHARED_NAME $PREFIX/lib"
+fi
+
+echo ""
+echo "uninstall:"
+echo "	-rm -r $PREFIX/include/netz"
+
+echo "	-rm $PREFIX/include/netz.h"
+
+if [ $DO_STATIC = YES ]
+then
+    echo "	-rm $PREFIX/lib/$STATIC_NAME"
+fi
+
+if [ $DO_SHARED = YES ]
+then
+    echo "	-rm $PREFIX/lib/$SHARED_NAME"
+fi
+
+echo ""
+
+if [ $SUFFIXES = YES ]
+then
+    echo ".SUFFIXES:.o .cc"
+    echo ".cc.o:"
+    echo "	$CC $CFLAGS -c $<"
+    echo ""
+fi
+
